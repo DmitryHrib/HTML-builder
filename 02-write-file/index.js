@@ -7,8 +7,13 @@ process.stdout.write('Прывітанне сябар. Калі ласка, ув
 
 process.stdin.on('data', data => {
     if (data.toString().trim() === 'exit') {
-        process.stdout.write('Да пабачэння');
+        process.stdout.write('Да пабачэння!');
         process.exit();
     }
     file.write(data);
+})
+
+process.on('SIGINT', () => {
+    process.stdout.write('Да пабачэння!')
+    process.exit()
 })
