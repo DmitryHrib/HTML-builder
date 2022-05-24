@@ -1,29 +1,42 @@
 const fs = require('fs');
 const path = require('path');
 
-// fs.mkdir(path.join(__dirname, 'project-dist'), { recursive: true }, (err) =>{
-//     if (err) {
-//         console.log(err)
-//     } 
-// });
 fs.rm(path.join(__dirname, 'project-dist'), {force: true, recursive: true}, (err) => {
     if (err) console.log(err);
     fs.mkdir(path.join(__dirname, 'project-dist'), {recursive: true}, (err) => {
-        if(err) return console.error(err);
-
+        if (err) {
+            console.log(err)
+        }; 
         createAssets();
         createStyle();
         createHtml();
     })
 }) 
 /////////HTML start
-function createHtml() { 
-    fs.copyFile(path.join(__dirname, 'template.html'), path.join(__dirname, 'project-dist', 'index.html'), fs.constants.COPYFILE_FICLONE, (err) => {
-        if (err) {
-            console.log(err)
-        } 
-
-    })
+function createHtml() {  
+    fs.readdir(path.join(__dirname, 'components'), {withFileTypes: true}, ((err, listFile) => {
+        if (err) throw err;
+        fs.readFile(path.join(__dirname, 'template.html'), 'utf-8', (err, data) => {
+            if (err) {
+                console.log(err)
+            } 
+          let template = data;
+          for (element of listFile) {
+            let fileName = element.name.split('.')[0];
+            fs.readFile(path.join(__dirname, 'components', element.name), 'utf-8', (err, cont) => {
+                if (err) {
+                    console.log(err)
+                }
+              template = template.replace(`{{${fileName}}}`, cont);                                              
+              fs.writeFile(path.join(__dirname, 'project-dist', 'index.html'), template, (err) => {
+                if (err) {
+                    console.log(err)
+                }
+              });       
+            });  
+          }
+        });  
+      }));
 }
 /////////HTMl end
 /////////Style start
